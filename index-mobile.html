@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>观音灵签 - 传统求签</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "苹方", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Hiragino Sans GB, Microsoft YaHei UI, Microsoft YaHei, Source Han Sans CN, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+            background: #f3f3f4;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            font-size: 14px;
+            line-height: 22px;
+            font-weight: 400;
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .guanyin-icon {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .guanyin-text {
+            font-size: 32px;
+            line-height: 40px;
+            color: #0052d9;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: 3px;
+        }
+
+        /* 主内容区 - 固定的白色框体 */
+        .main-card {
+            background: #fff;
+            border: 2px solid #e7e8eb;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 阶段内容 */
+        .stage-content {
+            display: none;
+            width: 100%;
+        }
+
+        .stage-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .stage-title {
+            font-size: 18px;
+            line-height: 26px;
+            color: #0052d9;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .prayer-description {
+            text-align: center;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 16px;
+            line-height: 24px;
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+
+        .prayer-description p {
+            margin-bottom: 10px;
+        }
+
+        .prayer-btn {
+            background: #0052d9;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            line-height: 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-weight: 600;
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .prayer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 82, 217, 0.3);
+        }
+
+        .tube-shaking {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            transform: scale(0.8);
+        }
+
+        /* 签筒主体 - 封闭式设计 */
+        .tube {
+            width: 80px;
+            height: 160px;
+            background: #713300;
+            border: 3px solid #532300;
+            border-radius: 8px 8px 16px 16px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+        }
+
+        /* 签筒顶盖 */
+        .tube-cap {
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            height: 24px;
+            background: #532300;
+            border: 3px solid #3b1700;
+            border-radius: 8px 8px 0 0;
+            z-index: 10;
+        }
+
+        /* 遮罩层 - 盖住签条尾部 */
+        .tube-mask {
+            position: absolute;
+            top: 20px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: #713300;
+            border: 3px solid #532300;
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            z-index: 8;
+        }
+
+        /* 签筒装饰纹 */
+        .tube-band {
+            position: absolute;
+            left: -3px;
+            right: -3px;
+            height: 8px;
+            background: #532300;
+            border-left: 3px solid #3b1700;
+            border-right: 3px solid #3b1700;
+        }
+
+        .tube-band:nth-child(2) {
+            top: 50px;
+        }
+
+        .tube-band:nth-child(3) {
+            bottom: 40px;
+        }
+
+        /* 莲花装饰 - 简约线条风格 */
+        .lotus-pattern {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            z-index: 9;
+        }
+
+        .lotus-pattern svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 签条 - 初始完全隐藏在筒内 */
+        .stick {
+            position: absolute;
+            width: 6px;
+            height: 120px;
+            background: #fff0ed;
+            border-radius: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 100px;
+            z-index: 5;
+            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+        }
+
+        /* 签条顶端 */
+        .stick::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: #881f1c;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .cups {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+        }
+
+        .cup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cup svg {
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .cup svg:hover {
+            transform: scale(1.1);
+        }
+
+        .cup-label {
+            font-size: 12px;
+            line-height: 20px;
+            color: #0052d9;
+            text-align: center;
+            min-height: 20px;
+            font-weight: 600;
+        }
+
+        /* 摇签动画 - 签筒晃动 */
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            10% { transform: rotate(-10deg); }
+            20% { transform: rotate(10deg); }
+            30% { transform: rotate(-10deg); }
+            40% { transform: rotate(10deg); }
+            50% { transform: rotate(-8deg); }
+            60% { transform: rotate(8deg); }
+            70% { transform: rotate(-6deg); }
+            80% { transform: rotate(6deg); }
+            90% { transform: rotate(-3deg); }
+        }
+
+        /* 签条弹出动画 - 摇动结束后才出现 */
+        @keyframes stick-out {
+            0%, 90% { 
+                top: 100px;
+                opacity: 0;
+            }
+            95% {
+                top: -70px;
+                opacity: 1;
+            }
+            100% { 
+                top: -60px;
+                opacity: 1;
+            }
+        }
+
+        .tube.shaking {
+            animation: shake 3s ease-in-out;
+        }
+
+        .tube.shaking .stick {
+            animation: stick-out 3s ease-in-out forwards;
+        }
+
+        /* 签条保持可见状态 - 动画结束后停留在画面上 */
+        .tube.stick-visible .stick {
+            top: -60px;
+            opacity: 1;
+        }
+
+        .cup-result {
+            text-align: center;
+            color: #0052d9;
+            font-size: 16px;
+            line-height: 24px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .loading-text {
+            text-align: center;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 14px;
+            line-height: 22px;
+            margin: 20px 0;
+            font-weight: 400;
+        }
+
+        /* 签文详情页面 - 单独的卡片 */
+        .result-card {
+            display: none;
+            background: #fff;
+            border: 2px solid #e7e8eb;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .result-card.active {
+            display: block;
+        }
+
+        .lottery-container {
+            max-width: 100%;
+        }
+
+        .lottery-title {
+            text-align: center;
+            font-size: 18px;
+            line-height: 26px;
+            color: #0052d9;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .lottery-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 12px 15px;
+            background: #e7e8eb;
+            border-radius: 8px;
+        }
+
+        .lottery-number {
+            font-size: 16px;
+            line-height: 24px;
+            color: #0052d9;
+            font-weight: 600;
+        }
+
+        .lottery-type {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            line-height: 20px;
+            font-weight: 600;
+        }
+
+        .lottery-type.上签 { background: #d4edda; color: #155724; }
+        .lottery-type.中签 { background: #fff3cd; color: #856404; }
+        .lottery-type.下签 { background: #d54941; color: #fff; }
+
+        .lottery-content {
+            background: #eeeef0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .lottery-poetry, .lottery-meaning, .lottery-explanation {
+            margin-bottom: 15px;
+        }
+
+        .lottery-poetry:last-child, 
+        .lottery-meaning:last-child, 
+        .lottery-explanation:last-child {
+            margin-bottom: 0;
+        }
+
+        .lottery-poetry h4, .lottery-meaning h4, .lottery-explanation h4 {
+            color: #0052d9;
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 22px;
+            font-weight: 600;
+        }
+
+        .lottery-poetry p, .lottery-meaning p, .lottery-explanation p {
+            color: rgba(0, 0, 0, 0.6);
+            line-height: 22px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="guanyin-icon">
+            <div class="guanyin-text">观音灵签</div>
+        </div>
+
+        <!-- 主内容区 - 固定的白色框体 -->
+        <div class="main-card" id="main-card">
+            <!-- 祈请阶段 -->
+            <div id="prayer-content" class="stage-content active">
+                <h2 class="stage-title">祈请观音菩萨</h2>
+                <div class="prayer-description">
+                    <p>请默想心中所求</p>
+                    <p>虔诚祈求菩萨赐予灵签</p>
+                </div>
+                <button id="start-prayer-btn" class="prayer-btn">开始求签</button>
+            </div>
+
+            <!-- 摇签阶段 -->
+            <div id="shaking-content" class="stage-content">
+                <h2 class="stage-title">摇动签筒</h2>
+                <div class="tube-shaking">
+                    <div class="tube" id="tube">
+                        <div class="tube-cap"></div>
+                        <div class="tube-band"></div>
+                        <div class="tube-band"></div>
+                        <!-- 莲花装饰 -->
+                        <div class="lotus-pattern">
+                            <svg viewBox="0 0 40 40" fill="none">
+                                <!-- 简约莲花 - 三片花瓣 -->
+                                <path d="M20 8 Q16 16 20 24 Q24 16 20 8" stroke="#be5a00" stroke-width="1.5" fill="none"/>
+                                <path d="M12 14 Q16 18 20 24 Q14 20 12 14" stroke="#be5a00" stroke-width="1.5" fill="none"/>
+                                <path d="M28 14 Q24 18 20 24 Q26 20 28 14" stroke="#be5a00" stroke-width="1.5" fill="none"/>
+                                <!-- 底部小圆点 -->
+                                <circle cx="20" cy="28" r="2" fill="#be5a00"/>
+                            </svg>
+                        </div>
+                        <div class="stick"></div>
+                        <div class="tube-mask"></div>
+                    </div>
+                </div>
+                <p class="loading-text">专注摇签中...</p>
+            </div>
+
+            <!-- 圣杯确认阶段 -->
+            <div id="confirmation-content" class="stage-content">
+                <h2 class="stage-title">圣杯确认</h2>
+                <div class="cups">
+                    <div id="cup1" class="cup">
+                        <svg width="80" height="120" viewBox="0 0 80 120">
+                            <g transform="translate(40, 60) rotate(-90) translate(-40, -60)">
+                                <path d="M 15 75 A 25 25 0 0 1 65 75 Z" 
+                                      fill="#8B0000" 
+                                      stroke="#000000" 
+                                      stroke-width="2"/>
+                                <ellipse cx="40" cy="58" rx="12" ry="8" 
+                                         fill="rgba(255,255,255,0.2)"/>
+                            </g>
+                        </svg>
+                        <div class="cup-label"></div>
+                    </div>
+                    <div id="cup2" class="cup">
+                        <svg width="80" height="120" viewBox="0 0 80 120">
+                            <g transform="translate(40, 60) rotate(-90) translate(-40, -60)">
+                                <path d="M 15 75 A 25 25 0 0 1 65 75 Z" 
+                                      fill="#8B0000" 
+                                      stroke="#000000" 
+                                      stroke-width="2"/>
+                                <ellipse cx="40" cy="58" rx="12" ry="8" 
+                                         fill="rgba(255,255,255,0.2)"/>
+                            </g>
+                        </svg>
+                        <div class="cup-label"></div>
+                    </div>
+                </div>
+                <p id="cup-result" class="cup-result"></p>
+                <button id="action-btn" class="prayer-btn" style="display: none; margin-top: 20px;">再求一签</button>
+            </div>
+        </div>
+
+        <!-- 签文详情 - 单独的卡片，只在圣杯时显示 -->
+        <div id="result-card" class="result-card">
+            <div class="lottery-container">
+                <h3 id="lottery-title" class="lottery-title"></h3>
+                <div class="lottery-info">
+                    <div class="lottery-number">第<span id="lottery-id">1</span>签</div>
+                    <div class="lottery-type" id="lottery-type">上签</div>
+                </div>
+                <div class="lottery-content">
+                    <div class="lottery-poetry">
+                        <h4>诗曰：</h4>
+                        <p id="poetry-text"></p>
+                    </div>
+                    <div class="lottery-meaning">
+                        <h4>诗意：</h4>
+                        <p id="meaning-text"></p>
+                    </div>
+                    <div class="lottery-explanation">
+                        <h4>解曰：</h4>
+                        <p id="explanation-text"></p>
+                    </div>
+                </div>
+                <button id="restart-btn" class="prayer-btn">再求一签</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="lottery-data.js"></script>
+    <script>
+        // 使用完整的数据
+        const lotteryData = guanyinLotteryData;
+
+        class SimpleGuanyinLottery {
+            constructor() {
+                this.mainCard = document.getElementById('main-card');
+                this.resultCard = document.getElementById('result-card');
+                
+                this.prayerContent = document.getElementById('prayer-content');
+                this.shakingContent = document.getElementById('shaking-content');
+                this.confirmationContent = document.getElementById('confirmation-content');
+                
+                this.cupResult = document.getElementById('cup-result');
+                this.actionBtn = document.getElementById('action-btn');
+                this.restartBtn = document.getElementById('restart-btn');
+                
+                this.init();
+            }
+
+            init() {
+                document.getElementById('start-prayer-btn').addEventListener('click', () => {
+                    this.startPrayer();
+                });
+
+                this.actionBtn.addEventListener('click', () => {
+                    this.handleAction();
+                });
+
+                this.restartBtn.addEventListener('click', () => {
+                    this.restartLottery();
+                });
+            }
+
+            switchContent(contentName) {
+                // 隐藏所有内容
+                this.prayerContent.classList.remove('active');
+                this.shakingContent.classList.remove('active');
+                this.confirmationContent.classList.remove('active');
+                
+                // 显示指定内容
+                switch(contentName) {
+                    case 'shaking':
+                        this.shakingContent.classList.add('active');
+                        break;
+                    case 'confirmation':
+                        this.confirmationContent.classList.add('active');
+                        break;
+                    default:
+                        this.prayerContent.classList.add('active');
+                }
+            }
+
+            startPrayer() {
+                // 隐藏签文卡片
+                this.resultCard.classList.remove('active');
+                this.mainCard.style.display = 'block';
+                
+                // 重置按钮状态和签筒状态
+                this.actionBtn.style.display = 'none';
+                const tube = document.getElementById('tube');
+                tube.classList.remove('shaking', 'stick-visible');
+                
+                // 开始摇签
+                this.switchContent('shaking');
+                this.startShakingAnimation();
+            }
+
+            startShakingAnimation() {
+                const tube = document.getElementById('tube');
+                tube.classList.remove('shaking', 'stick-visible');
+                // 强制重排
+                void tube.offsetHeight;
+                tube.classList.add('shaking');
+                
+                setTimeout(() => {
+                    tube.classList.remove('shaking');
+                    tube.classList.add('stick-visible');
+                    // 签条弹出后停留1秒再加载下一个画面
+                    setTimeout(() => {
+                        this.performDivineConfirmation();
+                    }, 1000);
+                }, 3000);
+            }
+
+            performDivineConfirmation() {
+                this.switchContent('confirmation');
+                // 先清空杯子内容，避免闪现
+                document.getElementById('cup1').querySelector('svg').innerHTML = '';
+                document.getElementById('cup2').querySelector('svg').innerHTML = '';
+                document.getElementById('cup1').querySelector('.cup-label').textContent = '';
+                document.getElementById('cup2').querySelector('.cup-label').textContent = '';
+                this.cupResult.textContent = '';
+                setTimeout(() => {
+                    this.showCupResult();
+                }, 1000);
+            }
+
+            showCupResult() {
+                const cup1Container = document.getElementById('cup1');
+                const cup2Container = document.getElementById('cup2');
+                
+                const results = [
+                    { 
+                        cup1: 'convex', 
+                        cup2: 'flat', 
+                        text: '圣杯 - 阴阳相合，求事有成',
+                        label1: '凸面朝上',
+                        label2: '平面朝上',
+                        type: 'holy'
+                    },
+                    { 
+                        cup1: 'convex', 
+                        cup2: 'convex', 
+                        text: '笑杯 - 心意未定，诚心再求',
+                        label1: '凸面朝上',
+                        label2: '凸面朝上',
+                        type: 'smile'
+                    },
+                    { 
+                        cup1: 'flat', 
+                        cup2: 'flat', 
+                        text: '阴杯 - 时机未到，静待佳期',
+                        label1: '平面朝上',
+                        label2: '平面朝上',
+                        type: 'yin'
+                    },
+                    { 
+                        cup1: 'flat', 
+                        cup2: 'convex', 
+                        text: '圣杯 - 阴阳相合，求事有成',
+                        label1: '平面朝上',
+                        label2: '凸面朝上',
+                        type: 'holy'
+                    }
+                ];
+                
+                const result = results[Math.floor(Math.random() * results.length)];
+                
+                // 先设置杯子图形
+                cup1Container.querySelector('svg').innerHTML = this.getCupSVG(result.cup1);
+                cup2Container.querySelector('svg').innerHTML = this.getCupSVG(result.cup2);
+                
+                // 清空文字，等动画结束后再显示
+                this.cupResult.textContent = '';
+                cup1Container.querySelector('.cup-label').textContent = '';
+                cup2Container.querySelector('.cup-label').textContent = '';
+                
+                // 执行旋转动画
+                this.animateCups(cup1Container.querySelector('svg'), cup2Container.querySelector('svg'));
+                
+                // 动画结束后（800ms）显示文字结果
+                setTimeout(() => {
+                    this.cupResult.textContent = result.text;
+                    cup1Container.querySelector('.cup-label').textContent = result.label1;
+                    cup2Container.querySelector('.cup-label').textContent = result.label2;
+                }, 800);
+                
+                // 再等待1.5秒后处理结果
+                setTimeout(() => {
+                    this.handleCupResult(result);
+                }, 2300);
+            }
+
+            getCupSVG(type) {
+                if (type === 'convex') {
+                    return `
+                        <g transform="translate(40, 60) rotate(-90) translate(-40, -60)">
+                            <path d="M 15 75 A 25 25 0 0 1 65 75 Z" 
+                                  fill="#8B0000" 
+                                  stroke="#000000" 
+                                  stroke-width="2"/>
+                            <ellipse cx="40" cy="58" rx="12" ry="8" 
+                                     fill="rgba(255,255,255,0.2)"/>
+                        </g>
+                    `;
+                } else {
+                    return `
+                        <g transform="translate(40, 60) rotate(-90) translate(-40, -60)">
+                            <path d="M 15 45 A 25 25 0 0 0 65 45 Z" 
+                                  fill="#8B0000" 
+                                  stroke="#000000" 
+                                  stroke-width="2"/>
+                            <line x1="18" y1="47" x2="62" y2="47" 
+                                  stroke="rgba(255,255,255,0.3)" 
+                                  stroke-width="1.5"/>
+                        </g>
+                    `;
+                }
+            }
+
+            animateCups(cup1, cup2) {
+                [cup1, cup2].forEach((cup, index) => {
+                    cup.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    cup.style.transform = `rotate(${360 + index * 180}deg) scale(1.1)`;
+                    
+                    setTimeout(() => {
+                        cup.style.transform = 'rotate(0deg) scale(1)';
+                    }, 800);
+                });
+            }
+
+            handleCupResult(result) {
+                if (result.type === 'holy') {
+                    // 圣杯 - 显示签文详情页面
+                    this.mainCard.style.display = 'none';
+                    this.showLotteryResult();
+                    this.resultCard.classList.add('active');
+                } else if (result.type === 'smile') {
+                    // 笑杯 - 显示重新摇签按钮
+                    this.actionBtn.textContent = '重新摇签';
+                    this.actionBtn.style.display = 'block';
+                    this.actionBtn.dataset.action = 'shake';
+                } else {
+                    // 阴杯 - 显示重新祈请按钮
+                    this.actionBtn.textContent = '重新祈请';
+                    this.actionBtn.style.display = 'block';
+                    this.actionBtn.dataset.action = 'pray';
+                }
+            }
+
+            showLotteryResult() {
+                const selectedLottery = lotteryData[Math.floor(Math.random() * lotteryData.length)];
+                
+                document.getElementById('lottery-title').textContent = selectedLottery.title;
+                document.getElementById('lottery-id').textContent = selectedLottery.id;
+                
+                const typeText = selectedLottery.type || '中签';
+                document.getElementById('lottery-type').textContent = typeText;
+                
+                const typeClass = typeText.includes('上') ? '上签' : 
+                                 typeText.includes('下') ? '下签' : '中签';
+                document.getElementById('lottery-type').className = 'lottery-type ' + typeClass;
+                
+                document.getElementById('poetry-text').textContent = selectedLottery.poetry;
+                document.getElementById('meaning-text').textContent = selectedLottery.meaning;
+                document.getElementById('explanation-text').textContent = selectedLottery.explanation;
+            }
+
+            handleAction() {
+                const action = this.actionBtn.dataset.action;
+                if (action === 'shake') {
+                    this.actionBtn.style.display = 'none';
+                    // 重置杯子内容和签筒状态
+                    this.cupResult.textContent = '';
+                    document.getElementById('cup1').querySelector('svg').innerHTML = '';
+                    document.getElementById('cup2').querySelector('svg').innerHTML = '';
+                    document.getElementById('cup1').querySelector('.cup-label').textContent = '';
+                    document.getElementById('cup2').querySelector('.cup-label').textContent = '';
+                    
+                    this.switchContent('shaking');
+                    this.startShakingAnimation();
+                } else {
+                    this.restartLottery();
+                }
+            }
+            // restartLottery() {
+            //     this.resultCard.classList.remove('active');
+            //     this.mainCard.style.display = 'block';
+            //     this.actionBtn.style.display = 'none';
+                
+            //     // 重置圣杯确认阶段的所有内容
+            //     this.cupResult.textContent = '';
+            //     document.getElementById('cup1').querySelector('svg').innerHTML = '';
+            //     document.getElementById('cup2').querySelector('svg').innerHTML = '';
+            //     document.getElementById('cup1').querySelector('.cup-label').textContent = '';
+            //     document.getElementById('cup2').querySelector('.cup-label').textContent = '';
+                
+            //     this.switchContent('prayer');
+                
+            //     // 强制重排
+            //     void this.mainCard.offsetHeight;
+            // }
+            restartLottery() {
+                location.reload();
+            }
+                    }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new SimpleGuanyinLottery();
+        });
+    </script>
+</body>
+</html>
